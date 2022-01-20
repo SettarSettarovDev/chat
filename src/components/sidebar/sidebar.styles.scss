@@ -1,0 +1,106 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 290px;
+  background: #ffffff;
+  box-shadow: 14.0351px 0px 25px rgba(86, 128, 248, 0.03),
+    35.0877px 0px 70px rgba(86, 128, 248, 0.05),
+    23.8596px 5.61404px 50px rgba(0, 0, 0, 0.02);
+
+  &__logo {
+    margin-top: 90px;
+    margin-bottom: 80px;
+    text-align: center;
+
+    &-img {
+      margin-bottom: 15px;
+    }
+
+    &-name {
+      position: relative;
+      & svg {
+        margin-left: 5px;
+        position: absolute;
+        top: 60%;
+        width: 20px;
+        height: 20px;
+        transform: translateY(-50%);
+      }
+    }
+
+    &-text {
+      display: inline-block;
+      font-size: 18px;
+    }
+  }
+
+  &__options {
+    display: flex;
+    flex: 1;
+    row-gap: 35px;
+    flex-direction: column;
+    margin-bottom: 50px;
+    padding-left: 40px;
+    color: #707c97;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      color: #707c97;
+      position: relative;
+      transition: all 0.2s linear;
+
+      &:last-child {
+        margin-top: auto;
+      }
+
+      svg {
+        width: 24px;
+        height: 24px;
+        fill: #707c97;
+      }
+
+      &::before {
+        content: '';
+        display: block;
+        height: 40px;
+        width: 3px;
+        position: absolute;
+        top: 0;
+        left: -40px;
+        background: transparent;
+        transition: all 0.2s linear;
+      }
+
+      &:hover,
+      &:active,
+      &.active {
+        color: #2a8bf2;
+
+        svg {
+          fill: #2a8bf2;
+        }
+      }
+
+      &:hover::before,
+      &:active::before,
+      &.active::before {
+        background: #2a8bf2;
+        box-shadow: 1px 0px 10px rgba(42, 139, 242, 0.45),
+          0px 0px 10px rgba(42, 139, 242, 0.55),
+          4px 0px 25px rgba(42, 139, 242, 0.75);
+      }
+    }
+
+    &-icon {
+      margin-right: 17px;
+    }
+
+    &-text {
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  }
+}
