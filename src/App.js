@@ -11,8 +11,17 @@ import SettingsPage from './pages/SettingsPage/SettingsPage';
 import SignInPage from './pages/SignIn/SignInPage';
 import SignUpPage from './pages/SignUp/SignUpPage';
 import './App.css';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { loginByToken } from './redux/authSlice';
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) dispatch(loginByToken());
+  }, [dispatch]);
+
   const { isAuth } = useSelector(state => state.auth);
 
   return (

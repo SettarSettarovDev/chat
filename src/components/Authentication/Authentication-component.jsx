@@ -1,13 +1,17 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIsAuth, setIsError, setToken } from '../../redux/authSlice';
+import {
+  loginByToken,
+  loginSecret,
+  registerSecret,
+  removeError,
+} from '../../redux/authSlice';
 import './Authentication.styles.scss';
 import ErrorMessage from '../Error-message/error-message.component';
 
 const Authentication = ({ closePopUp, userCredentials, fromPage }) => {
   const dispatch = useDispatch();
-  const { token, isError } = useSelector(state => state.auth);
+  const { error } = useSelector(state => state.auth);
 
   const { email, firstName, lastName, password } = userCredentials;
 
@@ -18,49 +22,35 @@ const Authentication = ({ closePopUp, userCredentials, fromPage }) => {
   const [value5, setValue5] = useState('');
   const [value6, setValue6] = useState('');
 
+  const secretKey = `${value1}${value2}${value3}${value4}${value5}${value6}`;
+
   const handleSubmit = async e => {
     e.preventDefault();
 
-    try {
-      let res;
+    if (fromPage === 'sign-up') {
+      const userCredentials = {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password,
+        secretKey: secretKey,
+      };
 
-      if (fromPage === 'sign-up') {
-        res = await axios.post(
-          'http://localhost:5000/register/secret',
-          {
-            email: email,
-            firstName: firstName,
-            lastName: lastName,
-            password: password,
-            secretKey: `${value1}${value2}${value3}${value4}${value5}${value6}`,
-          },
-          {
-            headers: {
-              Authorization: token,
-            },
-          }
-        );
+      const res = await dispatch(registerSecret(userCredentials));
+      if (res.hasOwnProperty('error')) return;
+      if (error) {
+        dispatch(removeError());
       }
+      await dispatch(loginByToken());
+    }
 
-      if (fromPage === 'sign-in') {
-        res = await axios.post(
-          'http://localhost:5000/login/secret',
-          {
-            secretKey: `${value1}${value2}${value3}${value4}${value5}${value6}`,
-          },
-          {
-            headers: {
-              Authorization: token,
-            },
-          }
-        );
+    if (fromPage === 'sign-in') {
+      const res = await dispatch(loginSecret({ secretKey }));
+      if (res.hasOwnProperty('error')) return;
+      if (error) {
+        dispatch(removeError());
       }
-
-      dispatch(setIsAuth(true));
-      dispatch(setToken(res.data.token));
-      dispatch(setIsError(null));
-    } catch (e) {
-      dispatch(setIsError(e.response.data.message));
+      await dispatch(loginByToken());
     }
   };
 
@@ -125,7 +115,7 @@ const Authentication = ({ closePopUp, userCredentials, fromPage }) => {
               required
             />
           </div>
-          {isError && <ErrorMessage message={isError} />}
+          {error && <ErrorMessage message={error} />}
           <button className="authentication-form__button" type="submit">
             Confirm
           </button>

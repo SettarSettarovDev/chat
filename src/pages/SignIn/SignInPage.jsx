@@ -1,16 +1,15 @@
-import axios from 'axios';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Popup from '../../components/pop-up/pop-up.component';
-import { setIsError, setToken } from '../../redux/authSlice';
+import { login, removeError } from '../../redux/authSlice';
 import Authentication from '../../components/Authentication/Authentication-component';
 import './SignInPage.styles.scss';
 import ErrorMessage from '../../components/Error-message/error-message.component';
 
 const SignInPage = () => {
   const dispatch = useDispatch();
-  const { isError } = useSelector(state => state.auth);
+  const { error } = useSelector(state => state.auth);
 
   const [userCredentials, setUserCredentials] = useState({
     email: '',
@@ -21,20 +20,24 @@ const SignInPage = () => {
 
   const { email, password } = userCredentials;
 
+  useEffect(() => {
+    if (error) {
+      dispatch(removeError());
+    }
+  }, [dispatch]);
+
   const handleSubmit = async e => {
     e.preventDefault();
 
-    try {
-      const res = await axios.post('http://localhost:5000/login', {
-        email: email,
-        password: password,
-      });
-      dispatch(setToken(res.data.token));
-      setIsOpenPopUp(true);
-      dispatch(setIsError(null));
-    } catch (e) {
-      dispatch(setIsError(e.response.data.message));
+    const res = await dispatch(login({ email, password }));
+
+    if (error) {
+      dispatch(removeError());
     }
+
+    if (res.hasOwnProperty('error')) return;
+
+    setIsOpenPopUp(true);
   };
 
   const handleChange = e => {
@@ -45,6 +48,7 @@ const SignInPage = () => {
 
   const closePopUp = () => {
     setIsOpenPopUp(false);
+    dispatch(removeError());
   };
 
   return (
@@ -83,7 +87,7 @@ const SignInPage = () => {
                 required
               />
             </div>
-            {isError && <ErrorMessage message={isError} />}
+            {error && <ErrorMessage message={error} />}
             <button className="sign-in-form__button" type="submit">
               Sign in
             </button>
